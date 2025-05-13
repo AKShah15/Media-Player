@@ -1,6 +1,9 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <windows.h>
+#include <mmsystem.h>
+#pragma comment(lib, "winmm.lib")
 using namespace std;
 
 // Base class
@@ -8,8 +11,9 @@ class MediaFile {
 protected:
     string title;
     float duration;
+    string filePath; // Added to store the actual media file path
 public:
-    MediaFile(string t, float d) : title(t), duration(d) {}
+    MediaFile(string t, float d, string path) : title(t), duration(d), filePath(path) {}
     virtual void play() = 0;
     virtual void pause() = 0;
     virtual void stop() = 0;
@@ -20,16 +24,33 @@ public:
 // Audio file
 class AudioFile : public MediaFile {
     string artist;
+    bool isPlaying;
 public:
-    AudioFile(string t, float d, string a) : MediaFile(t, d), artist(a) {}
+    AudioFile(string t, float d, string a, string path) : MediaFile(t, d, path), artist(a), isPlaying(false) {}
     void play() override {
         cout << "Playing audio: " << title << " by " << artist << endl;
+        if (!filePath.empty()) {
+            // Convert string to wstring for PlaySoundW
+            wstring wpath(filePath.begin(), filePath.end());
+            PlaySoundW(wpath.c_str(), NULL, SND_FILENAME | SND_ASYNC);
+            isPlaying = true;
+        } else {
+            cout << "Error: No audio file path specified!" << endl;
+        }
     }
     void pause() override {
-        cout << "Audio paused: " << title << endl;
+        if (isPlaying) {
+            PlaySound(NULL, NULL, 0); // Stop the current sound
+            cout << "Audio paused: " << title << endl;
+            isPlaying = false;
+        }
     }
     void stop() override {
-        cout << "Audio stopped: " << title << endl;
+        if (isPlaying) {
+            PlaySound(NULL, NULL, 0); // Stop the current sound
+            cout << "Audio stopped: " << title << endl;
+            isPlaying = false;
+        }
     }
     void displayInfo() override {
         cout << "Audio - Title: " << title << ", Artist: " << artist << ", Duration: " << duration << " mins" << endl;
@@ -40,7 +61,7 @@ public:
 class VideoFile : public MediaFile {
     string resolution;
 public:
-    VideoFile(string t, float d, string res) : MediaFile(t, d), resolution(res) {}
+    VideoFile(string t, float d, string res) : MediaFile(t, d, ""), resolution(res) {}
     void play() override {
         cout << "Playing video: " << title << " [" << resolution << "]" << endl;
     }
@@ -100,9 +121,10 @@ public:
 int main() {
     MediaPlayer player;
 
-    player.addMedia(make_shared<AudioFile>("Believer", 3.5, "Imagine Dragons"));
+    // Note: Replace these paths with actual .wav files on your system
+    player.addMedia(make_shared<AudioFile>("Believer", 3.5, "Imagine Dragons", "C:\\Users\\AYUSH\\Downloads\\Believer.wav"));
     player.addMedia(make_shared<VideoFile>("Nature Documentary", 10.0, "1080p"));
-    player.addMedia(make_shared<AudioFile>("Lose Yourself", 5.0, "Eminem"));
+    player.addMedia(make_shared<AudioFile>("Ding", 1.0, "Windows", "C:\\Windows\\Media\\ding.wav"));
 
     player.showPlaylist();
 

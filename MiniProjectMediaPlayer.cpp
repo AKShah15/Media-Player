@@ -123,8 +123,8 @@ int main() {
 
     // Note: Replace these paths with actual .wav files on your system
     player.addMedia(make_shared<AudioFile>("Believer", 3.5, "Imagine Dragons", "C:\\Users\\AYUSH\\Downloads\\Believer.wav"));
-    player.addMedia(make_shared<VideoFile>("Nature Documentary", 10.0, "1080p"));
-    player.addMedia(make_shared<AudioFile>("Ding", 1.0, "Windows", "C:\\Windows\\Media\\ding.wav"));
+    player.addMedia(make_shared<AudioFile>("perfect", 3.5, "Imagine Dragons", "C:\\Users\\AYUSH\\Downloads\\Perfect.wav"));
+    player.addMedia(make_shared<AudioFile>("Faded", 3.5, "Imagine Dragons", "C:\\Users\\AYUSH\\Downloads\\Faded.wav"));
 
     player.showPlaylist();
 
